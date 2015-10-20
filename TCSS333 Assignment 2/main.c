@@ -12,15 +12,22 @@ int main(void) {
 //    unsigned char header2[40];
     
     unsigned char arr2[499446];
+    unsigned char checkboardArr[499446];
     
     int i;
     
-    checkboard();
+    int row;   // Row number, from 0 to 7
+    int col;   // Column number, from 0 to 7
+    int count = 54;
+    bool status = false;
+    
+//    checkboard();
     
     // read the file in binary mode - rb
     FILE *in1 = fopen("in1.bmp", "rb");
     FILE *in2 = fopen("in2.bmp", "rb");
     FILE *outFile = fopen("doubleExposure.bmp", "wb");
+    FILE *outFile2 = fopen("checkboard.bmp", "wb");
     
     // check if the file is open
     if (!in1 || !in2)
@@ -52,10 +59,13 @@ int main(void) {
 //        arr2[i] = header2[i];
 //    }
     
+    // header
     for (i = 0; i < 54; i++) {
         arr2[i] = in1Arr[i];
     }
     
+    
+    // double exposure
     for (i = 54; i < 499446; i++) {
         arr2[i] = (in1Arr[i] + in2Arr[i]) / 2;
     }
@@ -64,11 +74,61 @@ int main(void) {
 //    arr2[55] = arr2[55] - 50;
 //    printf("%d\n", arr2[55]);
     
+    // checkboard
+    for (i = 0; i < 54; i++) {
+        checkboardArr[i] = in1Arr[i];
+    }
+    
+    for ( row = 0;  row < 8;  row++ ) {
+        
+        for ( col = 0;  col < 408;  col++) {
+
+            if ( (row % 2) == (col % 2) )
+                // printf("*");
+                status = true;
+            else
+                // printf("-");
+                status = false;
+            
+            
+            
+            if (status) {
+                i = 0;
+                while (i < (153)) {
+//                    printf("*");
+//                    printf("%d ", count++);
+                    checkboardArr[count] = in1Arr[count];
+                    count++;
+                    i++;
+                }
+            } else {
+                i = 0;
+                while (i < (153)) {
+//                    printf("-");
+//                    printf("%d ", count++);
+                    checkboardArr[count] = in2Arr[count];
+                    count++;
+                    i++;
+                }
+            }
+        }
+//        printf("\n");
+        
+    } // end for row
+    
+    printf("%d\n", count);
+    
+    // end of checkboard
+    
+    
+    
     fwrite(arr2, sizeof(char), 499446, outFile);
+    fwrite(checkboardArr, sizeof(char), 499446, outFile2);
     
     fclose(in1);
     fclose(in2);
     fclose(outFile);
+    fclose(outFile2);
     
     return 0;
 }
@@ -77,6 +137,7 @@ void checkboard(void) {
     int row;   // Row number, from 0 to 7
     int col;   // Column number, from 0 to 7
     int i;
+    int num = 100;
     
     bool status = false;
 //    int x,y;   // Top-left corner of square
@@ -93,16 +154,19 @@ void checkboard(void) {
                 // printf("-");
                 status = false;
             
+            
+            i = 0;
+            
             if (status) {
-                i = 0;
                 while (i < 5) {
                     printf("*");
+//                    printf("%d ", ++num);
                     i++;
                 }
             } else {
-                i = 0;
                 while (i < 5) {
                     printf("-");
+//                    printf("%d ", ++num);
                     i++;
                 }
             }
